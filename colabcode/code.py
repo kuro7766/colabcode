@@ -6,6 +6,7 @@ import nest_asyncio
 import uvicorn
 from pyngrok import ngrok
 
+import pickle
 
 try:
     from google.colab import drive
@@ -65,13 +66,18 @@ class ColabCode:
             public_url = tunnel.public_url
             ngrok.disconnect(public_url)
         url = ngrok.connect(addr=self.port, bind_tls=True)
+        
+        # save url to pickle file
+        with open("_ng_url.pkl", "wb") as f:
+            pickle.dump(url, f)
+
         if self._code:
             print(f"Code Server can be accessed on: {url}")
         else:
             print(f"Public URL: {url}")
 
     def _run_lab(self):
-        token = str(uuid.uuid1())
+        token = str('123456')
         print(f"Jupyter lab token: {token}")
         base_cmd = "jupyter-lab --ip='localhost' --allow-root --ServerApp.allow_remote_access=True --no-browser"
         os.system(f"fuser -n tcp -k {self.port}")
